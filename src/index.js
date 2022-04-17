@@ -1,27 +1,50 @@
 'use strict';
 
 import './css/styles.css';
+import { fetchCountries } from './js/fetchCountries.js';
 import debounce from 'lodash.debounce';
-import { fetchCountry } from './fetchCountries';
-import makeCard from './handlebars/card.hbs';
-import makeList from './handlebars/list.hbs';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
-const inputEl = document.querySelector('#search-box');
-const listSimilarResults = document.querySelector('.country-list');
+import listTemplate from './handlebars/list.hbs';
+import cardTemplate from './handlebars/card.hbs';
+
 const DEBOUNCE_DELAY = 300;
 
-const searchingFunction = event => {
-  let searchWord = event.target.value;
+const inputEl = document.querySelector('#search-box');
+const listEL = document.querySelector('.country-list');
+const infoEl = document.querySelector('.country-info');
 
-  fetchCountry(searchWord)
-    .then(data => {
-      if (data.length > 8) {
-        console.log('too much countries found');
+const onInputName = event => {
+  const searchName = event.target.value.trim();
+  if (searchName.length > 0) {
+    fetchCountries(searchName)
+      .then(data => {
+        innerData(data);
+      })
+      .catch(error => {
+        Notify.failure('Oops, there is no country with that name');
         return;
-      }
-      listSimilarResults.insertAdjacentHTML('beforeend', makeCard(data));
-    })
-    .catch(error => console.log(error));
+      });
+  } else {
+    Notify.failure('Please enter country');
+    listEL.innerHTML = '';
+    infoEl.innerHTML = '';
+  }
 };
 
-inputEl.addEventListener('input', debounce(searchingFunction, DEBOUNCE_DELAY));
+const innerData = data => {
+  if (data.length === 1) {
+    listEL.innerHTML = '';
+    data[0].languages = Object.values(data[0].languages).join(', ');
+    infoEl.innerHTML = cardTemplate(data);
+  } else {
+    infoEl.innerHTML = '';
+    listEL.innerHTML = listTemplate(data);
+  }
+  if (data.length > 10) {
+    listEL.innerHTML = '';
+    Notify.info('Too many matches found. Please enter a more specific name.');
+  }
+};
+
+inputEl.addEventListener('input', debounce(onInputName, DEBOUNCE_DELAY));

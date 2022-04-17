@@ -1,6 +1,6 @@
-<h1 class="card__title"><img width="70" height="50"src='{{flags.svg}}' class="card__flag"></span>{{name.common}}</h1>
-<p class="card__text"><span class="card__text-title">Capital:</span> {{capital}}</p>
-<p class="card__text"><span class="card__text-title">Population:</span> {{population}}</p>
-<p class="card__text"><span class="card__text-title">Languages:</span>{{#each languages}}
-          <p class="language-list__element">&nbsp{{this}}</p>
-  {{/each}}</p>
+{{#each this}}
+<h1 class="country__tittle"><img class="country__flag"  width="40" src="{{flags.svg}}">   {{name.common}}</h1>
+<p class="country__item"><span class="country__item-title">Capital:  </span>{{capital}}</p>
+<p class="country__item"><span class="country__item-title">Population:  </span>{{population}}</p>
+<p class="country__item"><span class="country__item-title">Languages:  </span>{{languages}}</p>
+{{/each}}
